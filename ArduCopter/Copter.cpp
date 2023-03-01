@@ -598,6 +598,11 @@ void Copter::three_hz_loop()
 
     // check if avoidance should be enabled based on alt
     low_alt_avoidance();
+    
+    /*Start: Asteria Code Change*/
+    asteria.disarm_sequence_number();
+    asteria.flight_sequence_number();
+    /*End: Asteria Code Change*/
 }
 
 // one_hz_loop - runs at 1Hz

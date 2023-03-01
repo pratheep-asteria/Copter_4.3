@@ -83,5 +83,9 @@ enum ap_message : uint8_t {
     MSG_ATTITUDE_TARGET,
     MSG_HYGROMETER,
     MSG_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE,
+    /*Start: Asteria Code Change*/
+    MSG_SEQ_NUM,
+    MSG_PRE_ARM_FLAG,
+    /*End: Asteria Code Change*/
     MSG_LAST // MSG_LAST must be the last entry in this enum
 };

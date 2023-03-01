@@ -369,6 +369,26 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     ASCALAR(angle_max, "ANGLE_MAX",                 DEFAULT_ANGLE_MAX),
 
+    /*Start: Asteria Code Change*/
+
+	// @Param: DISARM_SEQ_NUM
+	// @DisplayName: Disarm Sequence Number
+	// @Description: Disarm Sequence number keeps count of the number of times the UAV state goes from ARMED to DISARMED state. 0 means UAV has never gone to ARM state.
+	// @Range: 0 32,767
+	// @Increment: 1
+	// @User: Advanced
+	GSCALAR(disarm_seq_num, "DISARM_SEQ_NUM",  0),
+
+	// @Param: FLIGHT_SEQ_NUM
+	// @DisplayName: Flight Sequence Number
+	// @Description: Flight Sequence number maintains count of UAV state going from ARMED to DISARMED only when UAV altitude is above 5 meters since last ARM state. 0 means UAV has never flown befores.
+	// @Range: 0 32,767
+	// @Increment: 1
+	// @User: Advanced
+	GSCALAR(flight_seq_num, "FLIGHT_SEQ_NUM",  0),
+	
+	/*End: Asteria Code Change*/
+    
 #if MODE_POSHOLD_ENABLED == ENABLED
     // @Param: PHLD_BRAKE_RATE
     // @DisplayName: PosHold braking rate

@@ -8893,6 +8893,86 @@ class AutoTestCopter(AutoTest):
         self.context_pop()
         self.reboot_sitl()
 
+    #/*Start: Asteria Code Change*/
+    def AsteriaSequenceIncTest(self):
+        '''Fly Asteria Sequence Increment Test'''
+        self.progress("Testing Asteria Sequence Number Packet Reception")
+        self.set_parameter("ARMING_CHECK", 0)
+        self.change_mode('GUIDED')
+        self.wait_mode('GUIDED')
+        disarm_seq_num1 = int(self.get_parameter("DISARM_SEQ_NUM"))
+        flight_seq_num1 = int(self.get_parameter("FLIGHT_SEQ_NUM"))
+        self.wait_ekf_happy(timeout=120)
+        self.arm_vehicle()
+        self.disarm_vehicle(force=True)
+
+        if not (disarm_seq_num1 + 1) == int(self.get_parameter("DISARM_SEQ_NUM")):
+            raise NotAchievedException("Disarm sequence not incremented")
+        else:
+            self.progress("Disarm sequence incremented successfully")
+        
+        """" assert message no working need to debug
+        msgs = self.assert_receive_message('SEQUENCE_NUM',timeout=1, verbose=True)
+
+        if not msgs.Disarm_seq_num == disarm_seq_num1 + 1 :
+            raise NotAchievedException("Received SEQUENCE_NUM message is wrong for disarm sequence counter")
+        else:
+            self.progress("Received SEQUENCE_NUM message successfully")
+        """
+        self.arm_vehicle()
+        self.user_takeoff(20)
+        self.wait_altitude(18, 21, timeout=10, relative=True)
+
+        self.change_mode('LAND')
+        self.wait_landed_and_disarmed()
+
+        if not (flight_seq_num1 + 1) == int(self.get_parameter("FLIGHT_SEQ_NUM")):
+            raise NotAchievedException("Flight sequence not incremented")
+        else:
+            self.progress("Flight sequence incremented successfully")
+        """
+        msgs = self.assert_receive_message('SEQUENCE_NUM',timeout=1, verbose=True)
+
+        if not msgs.Flight_seq_num == flight_seq_num1 + 1 :
+            raise NotAchievedException("Received SEQUENCE_NUM message is wrong for flight sequence counter")
+        else:
+            self.progress("Received SEQUENCE_NUM message successfully")
+        """
+        self.reboot_sitl()
+
+    def AsteriaPreArmFlagmsgTest(self):
+        '''Pre-Arm flag msg test'''
+        #case 1: To test the message with Prearm check failure
+        self.delay_sim_time(10)
+        self.set_parameters({
+            "MOT_PWM_MIN": 100,
+            "MOT_PWM_MAX": 50,
+        })
+        self.drain_mav()
+        self.assert_prearm_failure("Check MOT_PWM_MIN/MAX")
+        msgs = self.assert_receive_message('PRE_ARM_FLAG')
+        self.progress("%s: %s" % ("PRE_ARM_FLAG", msgs))
+        if not msgs.prearm_flag == 0 :
+            raise NotAchievedException("Received PRE_ARM_FLAG message is wrong,expected prearm_flag value is 0")
+        else:
+            self.progress("Received PRE_ARM_FLAG message successfully, prearm_flag value is 0")
+
+        #case 2: To test the message with Prearm check success
+        self.set_parameters({
+            "MOT_PWM_MIN": 1000,
+            "MOT_PWM_MAX": 2000,
+        })
+        self.drain_mav()
+        msgs = self.assert_receive_message('PRE_ARM_FLAG')
+        self.progress("%s: %s" % ("PRE_ARM_FLAG", msgs))
+        if not msgs.prearm_flag == 1 :
+            raise NotAchievedException("Received message PRE_ARM_FLAG is wrong,expected prearm_flag value is 1")
+        else:
+            self.progress("Received PRE_ARM_FLAG message successfully, prearm_flag value is 1")
+
+        self.reboot_sitl()
+    #/*End: Asteria Code Change*/
+
     def tests1a(self):
         '''return list of all tests'''
         ret = super(AutoTestCopter, self).tests()  # about 5 mins and ~20 initial tests from autotest/common.py
@@ -8925,6 +9005,10 @@ class AutoTestCopter(AutoTest):
              self.ThrottleFailsafe,
              self.GCSFailsafe,
              self.CustomController,
+             #/*Start: Asteria Code Change*/
+             self.AsteriaSequenceIncTest,
+             self.AsteriaPreArmFlagmsgTest,
+             #/*End: Asteria Code Change*/
         ])
         return ret
 

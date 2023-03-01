@@ -189,7 +189,12 @@ public:
 
         // 97: RSSI
         k_param_rssi = 97,
-                
+
+        /*Start: Asteria Code Change*/
+        k_param_disarm_seq_num = 98, ///< Parameter for Disarm Sequence number
+		k_param_flight_seq_num = 99, ///< Parameter for Flight Sequence number   
+        /*End: Asteria Code Change*/
+     
         //
         // 100: Inertial Nav
         //
@@ -471,6 +476,11 @@ public:
     // Acro parameters
     AP_Int8                 acro_trainer;
 #endif
+    
+    /*Start: Asteria Code Change*/
+    AP_Int16				disarm_seq_num; ///< Disarm sequence number
+    AP_Int16 				flight_seq_num; ///< Flight sequence number
+    /*End: Asteria Code Change*/
 
     // Note: keep initializers here in the same order as they are declared
     // above.
