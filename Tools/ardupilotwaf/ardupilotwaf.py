@@ -14,6 +14,7 @@ SOURCE_EXTS = [
     '*.S',
     '*.c',
     '*.cpp',
+    'Asteria/*.cpp'
 ]
 
 COMMON_VEHICLE_DEPENDENT_LIBRARIES = [

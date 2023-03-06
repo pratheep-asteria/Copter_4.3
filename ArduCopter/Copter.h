@@ -180,6 +180,8 @@
 
 #include "mode.h"
 
+#include "Asteria/AP_Asteria.h" /*Asteria Code Change*/
+
 class Copter : public AP_Vehicle {
 public:
     friend class GCS_MAVLINK_Copter;
@@ -226,6 +228,8 @@ public:
     friend class ModeZigZag;
     friend class ModeAutorotate;
     friend class ModeTurtle;
+    
+    friend class AP_Asteria; /*Asteria Code Change*/
 
     Copter(void);
 
@@ -1020,6 +1024,10 @@ private:
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);
+    
+    /*Start: Asteria Code Change*/
+    AP_Asteria asteria; ///< Asteria Object
+    /*End: Asteria Code Change*/
 
 public:
     void failsafe_check();      // failsafe.cpp

@@ -368,6 +368,18 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
         break;
     }
 
+    /*Start: Asteria Code Change*/
+    case MSG_SEQ_NUM:
+		CHECK_PAYLOAD_SIZE(SEQUENCE_NUM);
+	    copter.asteria.send_seq_numbers(chan);
+	break;
+
+    case MSG_PRE_ARM_FLAG:
+        CHECK_PAYLOAD_SIZE(PRE_ARM_FLAG);
+        copter.asteria.send_prearm_flag(chan);
+        break;
+    /*End: Asteria Code Change*/
+
     default:
         return GCS_MAVLINK::try_send_message(id);
     }
@@ -516,7 +528,11 @@ static const ap_message STREAM_EXTRA1_msgs[] = {
     MSG_PID_TUNING // Up to four PID_TUNING messages are sent, depending on GCS_PID_MASK parameter
 };
 static const ap_message STREAM_EXTRA2_msgs[] = {
-    MSG_VFR_HUD
+    MSG_VFR_HUD,
+    /*Start: Asteria Code Change*/
+    MSG_SEQ_NUM,
+    MSG_PRE_ARM_FLAG,
+    /*End: Asteria Code Change*/
 };
 static const ap_message STREAM_EXTRA3_msgs[] = {
     MSG_AHRS,
