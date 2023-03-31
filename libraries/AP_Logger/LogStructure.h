@@ -701,6 +701,14 @@ struct PACKED log_VER {
     uint16_t _APJ_BOARD_ID;
 };
 
+/*Start: Asteria Code Change*/
+struct PACKED log_wind_est{
+    LOG_PACKET_HEADER;
+    float wind_spd;
+    float wind_dir;
+    bool is_High_wind;
+};
+/*End: Asteria Code Change*/
 
 // FMT messages define all message formats other than FMT
 // UNIT messages define units which can be referenced by FMTU messages
@@ -1333,7 +1341,14 @@ LOG_STRUCTURE_FROM_AIS \
     { LOG_VER_MSG, sizeof(log_VER), \
       "VER",   "QBHBBBBIZH", "TimeUS,BT,BST,Maj,Min,Pat,FWT,GH,FWS,APJ", "s---------", "F---------", false }, \
     { LOG_MOTBATT_MSG, sizeof(log_MotBatt), \
-      "MOTB", "QffffB",  "TimeUS,LiftMax,BatVolt,ThLimit,ThrAvMx,FailFlags", "s-----", "F-----" , true }
+      "MOTB", "QffffB",  "TimeUS,LiftMax,BatVolt,ThLimit,ThrAvMx,FailFlags", "s-----", "F-----" , true },\
+      ASTERIA_LOGGING_STRUCTURE /*Asteria Code Change*/
+
+/*Start: Asteria Code Change*/
+#define ASTERIA_LOGGING_STRUCTURE \
+    { LOG_WIND_EST_MSG, sizeof(log_wind_est),\
+      "WNDE","ffB","wSpd,wDir,highWind", "nd-", "---" }
+/*End: Asteria Code Change*/
 
 // message types 0 to 63 reserved for vehicle specific use
 
@@ -1419,6 +1434,10 @@ enum LogMessages : uint8_t {
     LOG_RCOUT2_MSG,
     LOG_RCOUT3_MSG,
     LOG_IDS_FROM_FENCE,
+
+    /*Start: Asteria Code Change*/
+    LOG_WIND_EST_MSG,
+    /*End: Asteria Code Change*/ 
 
     _LOG_LAST_MSG_
 };

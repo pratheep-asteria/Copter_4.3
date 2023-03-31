@@ -378,6 +378,11 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
         CHECK_PAYLOAD_SIZE(PRE_ARM_FLAG);
         copter.asteria.send_prearm_flag(chan);
         break;
+
+    case MSG_WIND_EST_GCS:
+        CHECK_PAYLOAD_SIZE(WIND_ESTIMATION);
+        copter.asteria.send_wind_estimate_to_GCS(chan);
+        break;
     /*End: Asteria Code Change*/
 
     default:
@@ -532,6 +537,7 @@ static const ap_message STREAM_EXTRA2_msgs[] = {
     /*Start: Asteria Code Change*/
     MSG_SEQ_NUM,
     MSG_PRE_ARM_FLAG,
+    MSG_WIND_EST_GCS,
     /*End: Asteria Code Change*/
 };
 static const ap_message STREAM_EXTRA3_msgs[] = {

@@ -68,4 +68,9 @@ enum class ModeReason : uint8_t {
   RADIO_FAILSAFE_RECOVERY = 48,
   QLAND_INSTEAD_OF_RTL = 49,
   DEADRECKON_FAILSAFE = 50,
+
+  /*Start: Asteria Code Change*/
+  WIND_FAILSAFE = 51, ///< Wind fail safe mode
+  /*End: Asteria Code Change*/
+
 };

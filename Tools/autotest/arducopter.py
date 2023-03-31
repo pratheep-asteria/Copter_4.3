@@ -8911,14 +8911,13 @@ class AutoTestCopter(AutoTest):
         else:
             self.progress("Disarm sequence incremented successfully")
         
-        """" assert message no working need to debug
         msgs = self.assert_receive_message('SEQUENCE_NUM',timeout=1, verbose=True)
 
         if not msgs.Disarm_seq_num == disarm_seq_num1 + 1 :
             raise NotAchievedException("Received SEQUENCE_NUM message is wrong for disarm sequence counter")
         else:
             self.progress("Received SEQUENCE_NUM message successfully")
-        """
+
         self.arm_vehicle()
         self.user_takeoff(20)
         self.wait_altitude(18, 21, timeout=10, relative=True)
@@ -8930,14 +8929,14 @@ class AutoTestCopter(AutoTest):
             raise NotAchievedException("Flight sequence not incremented")
         else:
             self.progress("Flight sequence incremented successfully")
-        """
+
         msgs = self.assert_receive_message('SEQUENCE_NUM',timeout=1, verbose=True)
 
         if not msgs.Flight_seq_num == flight_seq_num1 + 1 :
             raise NotAchievedException("Received SEQUENCE_NUM message is wrong for flight sequence counter")
         else:
             self.progress("Received SEQUENCE_NUM message successfully")
-        """
+
         self.reboot_sitl()
 
     def AsteriaPreArmFlagmsgTest(self):
@@ -8971,6 +8970,123 @@ class AutoTestCopter(AutoTest):
             self.progress("Received PRE_ARM_FLAG message successfully, prearm_flag value is 1")
 
         self.reboot_sitl()
+
+
+    def AsteriaWindfsHighwindFlg(self):
+        '''Test wind fail safe and high wind flag'''
+        self.context_push()
+        ex = None
+        try:
+            self.customise_SITL_commandline(
+                ["--defaults", ','.join(self.model_defaults_filepath('Callisto'))],
+                model="octa-quad:@ROMFS/models/Callisto.json",
+                wipe=True,
+            )
+            wind_spd_truth = 8.0
+            wind_dir_truth = 90.0
+            self.set_parameters({
+                "EK3_ENABLE": 1,
+                "EK2_ENABLE": 0,
+                "AHRS_EKF_TYPE": 3,
+            })
+            self.reboot_sitl()
+            self.set_parameters({
+                "SIM_WIND_DIR": wind_dir_truth,
+                "SIM_WIND_SPD": wind_spd_truth,
+                "SIM_WIND_T": 1.000000,
+                "MAX_WIND_SPEED" : 15
+            })
+            self.reboot_sitl()
+
+            # require_absolute=True infers a GPS is present
+            self.wait_ready_to_arm(require_absolute=False)
+
+            self.progress("Climb to 20m in LOITER and yaw spin for 30 seconds")
+            self.takeoff(25, mode="GUIDED")
+            self.set_rc(4, 1400)
+            self.delay_sim_time(30)
+
+            # Case1: check wind esitmates- wind speed, wind direction
+            m = self.mav.recv_match(type='WIND_ESTIMATION', blocking=True)
+
+            speed_error = abs(m.Wind_speed - wind_spd_truth)
+            angle_error = abs(m.Wind_direction - wind_dir_truth)
+
+            if (speed_error > 1.0):
+                raise NotAchievedException("Wind speed incorrect - want %f +-1 got %f m/s" % (wind_spd_truth, m.Wind_speed))
+
+            if (angle_error > 15.0):
+                raise NotAchievedException(
+                    "Wind direction incorrect - want %f +-15 got %f deg" %
+                    (wind_dir_truth, m.Wind_direction))
+                
+            self.progress("Wind estimate is good, now check for High wind flag")
+
+            # Case2: check High_wind_flag when estimated wind value < 70% of MAX_WIND_SPEED
+            self.set_parameters({
+                "MAX_WIND_SPEED" : 12
+            })
+            if not m.High_wind_flag == 0 :
+                raise NotAchievedException("High_wind_flag value is not correct,expected value is 0")
+            else:
+                self.progress("High_wind_flag value is correct,High_wind_flag = 0")
+
+            # Case3: check High_wind_flag when estimated wind value > 70% of MAX_WIND_SPEED for more than 5sec
+                self.set_parameters({
+                    "MAX_WIND_SPEED" : 10
+                })
+                self.delay_sim_time(6)#wait for 6 seconds
+                # check wind estimates
+                m = self.mav.recv_match(type='WIND_ESTIMATION', blocking=True)        
+
+            if not m.High_wind_flag == 1 :
+                raise NotAchievedException("High_wind_flag value is not correct,expected value is 1")
+            else:
+                self.progress("High_wind_flag value is correct,High_wind_flag = 1")
+            
+            # Case4: check reset of High_wind_flag when estimated wind value is reduced
+                self.set_parameters({
+                    "MAX_WIND_SPEED" : 12
+                })
+                self.delay_sim_time(1)
+                # check wind estimates
+                m = self.mav.recv_match(type='WIND_ESTIMATION', blocking=True)        
+
+            if not m.High_wind_flag == 0 :
+                raise NotAchievedException("High_wind_flag value is not correct,expected value is 0")
+            else:
+                self.progress("High_wind_flag value is correct,High_wind_flag = 0")
+
+            self.progress("High_wind_flag is good, now check for wind fail safe")
+
+            # Case5: check wind fail safe is triggered when estimated wind value > MAX_WIND_SPEED for more than 3sec
+            self.set_parameters({
+                "MAX_WIND_SPEED" : 7
+                })
+
+            if not self.mode_is("RTL"):
+                self.progress("RTL not triggered before 3 seconds")
+            else:
+                raise NotAchievedException("RTL triggered before 3 seconds")
+
+            self.delay_sim_time(3)  
+
+            if not self.mode_is("RTL"):
+                raise NotAchievedException("NO RTL triggered,when estimated wind value > MAX_WIND_SPEED for more than 3sec ")
+            else:
+                self.progress("RTL triggered,when estimated wind value > MAX_WIND_SPEED for more than 3sec")
+
+        
+        except Exception as e:
+            self.print_exception_caught(e)
+            ex = e
+        self.disarm_vehicle(force=True)
+        self.reboot_sitl()
+        self.context_pop()
+        self.reboot_sitl()
+        if ex is not None:
+            raise ex
+
     #/*End: Asteria Code Change*/
 
     def tests1a(self):
@@ -9008,6 +9124,7 @@ class AutoTestCopter(AutoTest):
              #/*Start: Asteria Code Change*/
              self.AsteriaSequenceIncTest,
              self.AsteriaPreArmFlagmsgTest,
+             self.AsteriaWindfsHighwindFlg,
              #/*End: Asteria Code Change*/
         ])
         return ret

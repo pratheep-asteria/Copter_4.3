@@ -1,5 +1,5 @@
 /**
- * @file myclass.h
+ * @file Seq_num.cpp
  * This file contains below Asteria added features
  *  1. Disarm sequence number calculation
  *  2. Flight sequence number calculation
