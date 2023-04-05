@@ -386,7 +386,19 @@ const AP_Param::Info Copter::var_info[] = {
 	// @Increment: 1
 	// @User: Advanced
 	GSCALAR(flight_seq_num, "FLIGHT_SEQ_NUM",  0),
-	
+
+    // @Param: HIGH-WIND_FS
+    // @DisplayName: HIGH WIND FAILSAFE
+    // @Description: This is to set whether you want to enable or disable High Wind failsafe,, if high_wind_fs is 0 then that means High wind failsafe is disabled, 1 means enabled.
+    // @User: Advanced
+    GSCALAR(high_wind_fs, "HIGH_WIND_FS",  1),
+
+    // @Param: WIND_THRESHOLD_VAL
+    // @DisplayName: WIND_THRESHOLD_VAL
+    // @Description: This is to set a threshold value for High Wind failsafe ( 10> and <15)
+    // @User: Advanced
+    GSCALAR(max_wind_speed, "MAX_WIND_SPEED",  MAX_WIND_SPEED_DEFAULT ),
+
 	/*End: Asteria Code Change*/
     
 #if MODE_POSHOLD_ENABLED == ENABLED

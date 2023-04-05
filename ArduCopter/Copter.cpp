@@ -554,6 +554,17 @@ void Copter::ten_hz_logging_loop()
         g2.winch.write_log();
     }
 #endif
+    
+    /*Start: Asteria Code Change*/
+
+    // set wind speed and wind directions
+    asteria.set_Wind_dir_Wind_Spd();
+
+    if(g.high_wind_fs==1 && inertial_nav.get_speed_xy_cms() < 20 && inertial_nav.get_position_z_up_cm()>2000)
+    {
+        asteria.high_wind_flag_failsafe();  // wind speed estimation @10hz if parameter high_wind_fs is enable
+    }
+    /*End: Asteria Code Change*/
 }
 
 // twentyfive_hz_logging - should be run at 25hz
@@ -633,6 +644,10 @@ void Copter::one_hz_loop()
 #if HAL_ADSB_ENABLED
     adsb.set_is_flying(!ap.land_complete);
 #endif
+    /*Start: Asteria Code Change*/
+    asteria.log_wind_estimate_to_Dflash();
+
+    /*End: Asteria Code Change*/
 
     AP_Notify::flags.flying = !ap.land_complete;
 }

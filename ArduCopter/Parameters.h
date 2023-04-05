@@ -192,7 +192,7 @@ public:
 
         /*Start: Asteria Code Change*/
         k_param_disarm_seq_num = 98, ///< Parameter for Disarm Sequence number
-		k_param_flight_seq_num = 99, ///< Parameter for Flight Sequence number   
+        k_param_flight_seq_num = 99, ///< Parameter for Flight Sequence number
         /*End: Asteria Code Change*/
      
         //
@@ -383,6 +383,11 @@ public:
 
         k_param_vehicle = 257, // vehicle common block of parameters
 
+        /*Start: Asteria Code Change*/
+        k_param_high_wind_fs =261,   ///< high wind estimation on/off
+        k_param_max_wind_speed =262, ///<high wind threshold (float) value for high wind failsafe
+        /*End: Asteria Code Change*/
+
         // the k_param_* space is 9-bits in size
         // 511: reserved
     };
@@ -480,6 +485,8 @@ public:
     /*Start: Asteria Code Change*/
     AP_Int16				disarm_seq_num; ///< Disarm sequence number
     AP_Int16 				flight_seq_num; ///< Flight sequence number
+    AP_Int8 				high_wind_fs;   ///< high wind fail safe on/off
+    AP_Float				max_wind_speed; ///< high wind threshold value
     /*End: Asteria Code Change*/
 
     // Note: keep initializers here in the same order as they are declared

@@ -86,6 +86,7 @@ enum ap_message : uint8_t {
     /*Start: Asteria Code Change*/
     MSG_SEQ_NUM,
     MSG_PRE_ARM_FLAG,
+    MSG_WIND_EST_GCS,
     /*End: Asteria Code Change*/
     MSG_LAST // MSG_LAST must be the last entry in this enum
 };
