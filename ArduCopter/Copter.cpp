@@ -562,8 +562,12 @@ void Copter::ten_hz_logging_loop()
 
     if(g.high_wind_fs==1 && inertial_nav.get_speed_xy_cms() < 20 && inertial_nav.get_position_z_up_cm()>2000)
     {
-        asteria.high_wind_flag_failsafe();  // wind speed estimation @10hz if parameter high_wind_fs is enable
+        asteria.high_wind_flag_failsafe();  /// wind speed estimation @10hz if parameter high_wind_fs is enable
     }
+
+#if COPTER_TYPE_A200 == ENABLE
+    asteria.asteria_led_status(); ///Navigation LED pattern for A200 @10Hz
+#endif
     /*End: Asteria Code Change*/
 }
 

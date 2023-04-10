@@ -122,6 +122,15 @@ extern AP_Vehicle& vehicle;
  */
 void AP_Vehicle::setup()
 {
+    /*Start: Asteria Code Change*/
+#ifdef COPTER_TYPE_A200
+    ap_ready = 0;
+
+    //Schedule initialisation LED task
+    hal.scheduler->register_timer_process(FUNCTOR_BIND_MEMBER(&AP_Vehicle::init_led, void));
+#endif 
+    /*End: Asteria Code Change*/
+
     // load the default values of variables listed in var_info[]
     AP_Param::setup_sketch_defaults();
 
@@ -259,7 +268,11 @@ void AP_Vehicle::setup()
 #endif
 
     custom_rotations.init();
-
+/*Start: Asteria Code Change*/
+#ifdef COPTER_TYPE_A200
+    ap_ready = 1; /*Asteria Code Change*/
+#endif
+/*End: Asteria Code Change*/
     gcs().send_text(MAV_SEVERITY_INFO, "ArduPilot Ready");
 }
 
@@ -722,6 +735,49 @@ void AP_Vehicle::one_Hz_update(void)
 #endif
     }
 }
+
+/*Start: Asteria Code Change*/
+#ifdef COPTER_TYPE_A200
+///Flash Initialization LED pattern alternating Red and Green
+void AP_Vehicle::init_led()
+{
+    static uint8_t pattern_counter = 0;
+    static bool only_once = 1;
+    if (AP_HAL::millis() % 100 != 0) { //5Hz flashing rate
+        return;
+    }
+
+    if( ap_ready == 1)///AP is ready and set both LEDs to off
+    {
+        if(only_once == 1)
+        {
+            hal.gpio->write(RED_LED,0);
+            hal.gpio->write(GREEN_LED,0);
+            only_once = 0;
+        }
+        return;        
+    }
+
+    hal.gpio->pinMode(RED_LED, HAL_GPIO_OUTPUT);
+    hal.gpio->pinMode(GREEN_LED, HAL_GPIO_OUTPUT);
+
+    if (pattern_counter % 2 == 0) {
+        hal.gpio->write(RED_LED,0);
+        hal.gpio->write(GREEN_LED,1);
+    }
+
+    else {
+        hal.gpio->write(RED_LED,1);
+        hal.gpio->write(GREEN_LED,0);
+    }
+    pattern_counter++;
+
+    if (pattern_counter >= 10) {
+        pattern_counter = 0;
+    }
+}
+#endif
+/*End: Asteria Code Change*/
 
 AP_Vehicle *AP_Vehicle::_singleton = nullptr;
 

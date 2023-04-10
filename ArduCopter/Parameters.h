@@ -386,6 +386,9 @@ public:
         /*Start: Asteria Code Change*/
         k_param_high_wind_fs =261,   ///< high wind estimation on/off
         k_param_max_wind_speed =262, ///<high wind threshold (float) value for high wind failsafe
+#if COPTER_TYPE_A200 == ENABLE
+        k_param_led_toggle_enable = 263, ///< Navigation LED Flashing Pattern enable/disable for A200
+#endif
         /*End: Asteria Code Change*/
 
         // the k_param_* space is 9-bits in size
@@ -481,12 +484,15 @@ public:
     // Acro parameters
     AP_Int8                 acro_trainer;
 #endif
-    
+
     /*Start: Asteria Code Change*/
     AP_Int16				disarm_seq_num; ///< Disarm sequence number
     AP_Int16 				flight_seq_num; ///< Flight sequence number
     AP_Int8 				high_wind_fs;   ///< high wind fail safe on/off
     AP_Float				max_wind_speed; ///< high wind threshold value
+#if COPTER_TYPE_A200 == ENABLE
+    AP_Int8 				led_toggle_enable; ///< To enable Navigation LED Flashing Pattern for A200
+#endif
     /*End: Asteria Code Change*/
 
     // Note: keep initializers here in the same order as they are declared

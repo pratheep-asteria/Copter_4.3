@@ -1033,6 +1033,28 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
         GCS_MAVLINK_Copter::convert_COMMAND_LONG_to_COMMAND_INT(packet, packet_int);
         return handle_command_pause_continue(packet_int);
     }
+    /*Start: Asteria Code Change */
+#if COPTER_TYPE_A200 == ENABLE
+    ///mav link command for LED pattern on(1)/off(0)
+    case MAV_CMD_LED_POWER: {
+        if((uint16_t)packet.param1==1)
+        {
+            copter.asteria.led_power_request=1;
+            return MAV_RESULT_ACCEPTED;
+        }
+        else if((uint16_t)packet.param1==0)
+        {
+            copter.asteria.led_power_request=0;
+            return MAV_RESULT_ACCEPTED;
+        }
+        else
+        {
+            return MAV_RESULT_FAILED;
+        }
+        break;
+    }
+#endif
+    /*End: Asteria Code Change */
     default:
         return GCS_MAVLINK::handle_command_long_packet(packet);
     }

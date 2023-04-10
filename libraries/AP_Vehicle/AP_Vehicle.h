@@ -57,6 +57,14 @@
 #include <AC_Fence/AC_Fence.h>
 #include <AP_CheckFirmware/AP_CheckFirmware.h>
 
+/*Start: Asteria Code Change*/
+#define COPTER_TYPE_A200  1 ///< 1 only for A200(0 for other coprer programs)
+#ifdef COPTER_TYPE_A200
+#define RED_LED 54 //PIXHAWK_AUX_5
+#define GREEN_LED 55 //PIXHAWK_AUX_6
+#endif
+/*End: Asteria Code Change*/
+
 class AP_Vehicle : public AP_HAL::HAL::Callbacks {
 
 public:
@@ -461,6 +469,14 @@ private:
     uint32_t _last_internal_errors;  // backup of AP_InternalError::internal_errors bitmask
 
     AP_CustomRotations custom_rotations;
+
+    /*Start: Asteria Code Change*/
+#ifdef COPTER_TYPE_A200
+    bool ap_ready; ///< To check AP initialization status
+    //Flash Initialization LED pattern
+    void init_led();
+#endif
+    /*End: Asteria Code Change*/
 };
 
 namespace AP {

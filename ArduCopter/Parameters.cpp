@@ -399,6 +399,13 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     GSCALAR(max_wind_speed, "MAX_WIND_SPEED",  MAX_WIND_SPEED_DEFAULT ),
 
+#if COPTER_TYPE_A200 == ENABLE
+    // @Param: LED_TOGGLE_ENBLE
+	// @DisplayName: lED Toggle Switch.
+	// @Description: Parameter to Toggle LED. LED will not run if value 0.
+	// @User: Advanced
+    GSCALAR(led_toggle_enable, "LED_TOGGLE_ENBLE", 1),
+#endif
 	/*End: Asteria Code Change*/
     
 #if MODE_POSHOLD_ENABLED == ENABLED
